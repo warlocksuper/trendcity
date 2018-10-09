@@ -89,17 +89,7 @@ public class HarwestWood : MonoBehaviour {
         switch (itemsname)
         {
             case "Log":
-                /*
-                if (PlayerIO.isNetwork)
-                {
-                    MenuManager.instance.Debuglog("Собранны бревна");
-                } else
-                {
-                    Gamelocal.instance.Debuglog("Собранны бревна");
-                }
-                */
                 Debug.Log("Собранны бревна");
-                //InventarControler.instance.addItem(itemsname, InventarControler.ItemsType.ITEM);
             break;
             
         }
@@ -119,8 +109,6 @@ public class HarwestWood : MonoBehaviour {
 
 
         Destroy(tree, 5);
-        //Vector3 position = treePos + Vector3(0,0,0);
-        //Instantiate(logs, tree.transform.position + Vector3(0,0,0) + position, Quaternion.identity);
 
         Vector3 positionleg1 = treePos;
         Vector3 positionleg2 = treePos;

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerIO : MonoBehaviour {
 
@@ -11,6 +12,7 @@ public class PlayerIO : MonoBehaviour {
     public GameObject ShopSystem;
     public GameObject cMenu;
     public GameObject CraftMan;
+    public GameObject Chatinput;
 
     public byte selectedInventory = 0;
     private bool inventar_isActive = false;
@@ -38,9 +40,29 @@ public class PlayerIO : MonoBehaviour {
 
         }
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return))
+        {
+            if (Chatinput.activeSelf)
+            {
+                if (isNetwork)
+                {
+                    NetworkLayerClient networkLayerClient = GameObject.Find("NetworkManager").GetComponent<NetworkLayerClient>();
+                    string text=Chatinput.GetComponentInChildren<InputField>().text;
+                    networkLayerClient.SendChat(text);
+                }
+                Chatinput.SetActive(false);
+            } else
+            {
+                Chatinput.SetActive(true);
+
+                
+            }
+        }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
         {
             Prefinv.SetActive(false);
+            Chatinput.SetActive(false);
 
             if (cMenu.activeSelf)
             {
@@ -57,11 +79,13 @@ public class PlayerIO : MonoBehaviour {
         {
             Player.GetComponent<MouseLook>().enabled = true;
             Player.transform.GetChild(1).GetComponent<MouseLook>().enabled = true;
+            Player.GetComponent<CharacterMotor>().enabled = true;
             Cursor.visible = false;
 
         } else
         {
             Player.GetComponent<MouseLook>().enabled = false;
+            Player.GetComponent<CharacterMotor>().enabled = false;
             Cursor.visible = true;
             Player.transform.GetChild(1).GetComponent<MouseLook>().enabled = false;
         }
@@ -79,6 +103,8 @@ public class PlayerIO : MonoBehaviour {
         else if (cMenu != null && cMenu.activeSelf)
             return true;
         else if (CraftMan != null && CraftMan.activeSelf)
+            return true;
+        else if (Chatinput != null && Chatinput.activeSelf)
             return true;
         else
         {

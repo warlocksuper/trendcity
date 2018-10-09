@@ -6,11 +6,13 @@ public class PickUpItem : MonoBehaviour
     private Inventory _inventory;
     private GameObject _player;
     private PlayerIO playerIO;
+    private MenuManager menuManager;
     // Use this for initialization
 
     void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player");
+        menuManager = GameObject.Find("MenuManager").GetComponent<MenuManager>();
         playerIO = _player.GetComponent<PlayerIO>();
         if (_player != null)
             _inventory = _player.GetComponent<PlayerInventory>().inventory.GetComponent<Inventory>();
@@ -28,7 +30,8 @@ public class PickUpItem : MonoBehaviour
                 
                 if (playerIO.isNetwork)
                 {
-                    MenuManager.instance.Debuglog("Собранно " + item.itemName + " колличество " + item.itemValue);
+                    menuManager.Debuglog("Собранно " + item.itemName + " колличество " + item.itemValue);
+                    //MenuManager.instance.Debuglog();
                     GameObject.Find("NetworkManager").GetComponent<NetworkLayerClient>().HarwestWood(item.itemID, item.itemValue);
                     Destroy(this.gameObject);
                 }

@@ -20,30 +20,13 @@ public class MenuManager : MonoBehaviour {
     public Camera firstcamera;
     public Text debugingame;
     private float timeLeft = 30.0f;
-
+    private List<string> chatmessages;
     // Use this for initialization
     private void Awake()
 	{
 		instance = this;
-	}
-
-
-    // Update is called once per frame
-    void Update()
-    {
-        if( timeLeft >= 0) { 
-        timeLeft -= Time.deltaTime;
-            if (timeLeft < 0)
-            {
-                if (debugingame != null)
-                {
-                    debugingame.text = "";
-                }
-               // GameOver();
-            }
-        }
+        chatmessages = new List<string>();
     }
-
 
 
     public void Loadscene()
@@ -77,9 +60,18 @@ public class MenuManager : MonoBehaviour {
 
     public void Debuglog(string text)
     {
-
-	    debugingame.text = text;
-        timeLeft = 3.0f;
+        if(chatmessages.Count > 10)
+        {
+            chatmessages.RemoveAt(0);
+        }
+        chatmessages.Add(text);
+        //debugingame.text
+        string displaytext="";
+        for(int i=0;i< chatmessages.Count;i++)
+        {
+            displaytext += chatmessages[i] + "\n";
+        }
+        debugingame.text = displaytext;
     }
 
     public void QuiTScene()
@@ -90,5 +82,6 @@ public class MenuManager : MonoBehaviour {
         Application.Quit ();
 #endif
     }
+
 
 }

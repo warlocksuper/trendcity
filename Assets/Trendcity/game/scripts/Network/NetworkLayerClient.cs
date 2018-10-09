@@ -23,7 +23,8 @@ public enum PackegType
     HarwestWood,
     RotateBlock,
     CraftItem,
-    RemoveHome
+    RemoveHome,
+    SendChat
 }
 
 
@@ -294,7 +295,7 @@ public class NetworkLayerClient : MonoBehaviour {
                         break;
                     case PackegType.CreateNewBlock:
                         NetworkBlock networkBlock = reader.ReadMessage<NetworkBlock>();
-                        Debug.Log("PackegType.CreateNewBlock block homeid=" + networkBlock.homeid);
+                        //Debug.Log("PackegType.CreateNewBlock block homeid=" + networkBlock.homeid);
                         onCreateNewBlock(networkBlock);
 
                         break;
@@ -309,6 +310,11 @@ public class NetworkLayerClient : MonoBehaviour {
                         {
                             Destroy(remobj);
                         }
+                        break;
+                    case PackegType.SendChat:
+                        string chattext = reader.ReadString();
+                        MenuManager menuManager = GameObject.Find("MenuManager").GetComponent<MenuManager>();
+                        menuManager.Debuglog(chattext);
                         break;
                     default:
                         break;
@@ -447,6 +453,14 @@ public class NetworkLayerClient : MonoBehaviour {
         writer.Write((int)PackegType.BuyItems);
         writer.Write(item.itemID);
         writer.Write(count);
+        Send(writer, channelId, connectionId);
+    }
+
+    public void SendChat(string test)
+    {
+        NetworkWriter writer = new NetworkWriter();
+        writer.Write((int)PackegType.SendChat);
+        writer.Write(test);
         Send(writer, channelId, connectionId);
     }
 
