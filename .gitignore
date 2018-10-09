@@ -259,3 +259,17 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+/Library
+/Temp
+/ProjectSettings
+/player.dat
+/player - копия.dat
+/city_my.dat
+/city.dat
+/Assets/Resources
+/Assets/WorldBuilder
+/Assets/Olive_Tree
+/Assets/ADG_Textures/ground_vol1
+/Assets/ABs
+/Assets/SampleScenes
+/Assets/Standard Assets
