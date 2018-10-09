@@ -50,6 +50,7 @@ public class PlayerIO : MonoBehaviour {
                     string text=Chatinput.GetComponentInChildren<InputField>().text;
                     networkLayerClient.SendChat(text);
                 }
+                Chatinput.GetComponentInChildren<InputField>().text = "";
                 Chatinput.SetActive(false);
             } else
             {
