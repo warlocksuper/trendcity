@@ -279,34 +279,36 @@ public class Block : MonoBehaviour {
                 Vector3 max = hit.collider.bounds.max;
                 newpos = colob.transform.position;
 
+                Debug.Log("CreatePosition minX=" + min.x+ " hit.point.x="+ hit.point.x+" minY="+min.y+ "  hit.point.y="+ hit.point.y + " minz=" + min.z + "  hit.point.z=" + hit.point.z);
+
                 if (hit.point.x == min.x)
                 {
-                   // Debug.Log("left");
+                    Debug.Log("left");
                     newpos.x -= 1f;
                 }
                 if (hit.point.x == max.x)
                 {
-                    //Debug.Log("right");
+                    Debug.Log("right");
                     newpos.x += 1f;
                 }
                 if (hit.point.y == min.y)
                 {
-                    //Debug.Log("bottom");
+                    Debug.Log("bottom");
                     newpos.y -= 1f;
                 }
                 if (hit.point.y == max.y)
                 {
-                    //Debug.Log("top");
+                    Debug.Log("top");
                     newpos.y += 1f;
                 }
                 if (hit.point.z == min.z)
                 {
-                    //Debug.Log("front");
+                    Debug.Log("front");
                     newpos.z -= 1f;
                 }
                 if (hit.point.z == max.z)
                 {
-                    //Debug.Log("back");
+                    Debug.Log("back");
                     newpos.z += 1f;
                 }
                 break;
