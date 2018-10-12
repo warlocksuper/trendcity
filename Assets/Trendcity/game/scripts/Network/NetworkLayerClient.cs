@@ -77,6 +77,7 @@ public class NetworkLayerClient : MonoBehaviour {
     public Inventory playerInventory;
     private PlayerIO playerIO;
     public int PlayerMoney = 0;
+    public int PlayerLodka = 0;
     private GameObject txmoney;
     private GameObject Txmanount;
     public int workercount=0;
@@ -192,9 +193,7 @@ public class NetworkLayerClient : MonoBehaviour {
                         Player.instance.homecity = reader.ReadInt32();
                         Player.instance.currentcity = reader.ReadInt32();
                         PlayerMoney = reader.ReadInt32();
-
-                        
-
+                        PlayerLodka = reader.ReadInt32();
 
                         if (Player.instance.Access == 1)
                         {
@@ -296,7 +295,7 @@ public class NetworkLayerClient : MonoBehaviour {
                     case PackegType.CreateNewBlock:
                         NetworkBlock networkBlock = reader.ReadMessage<NetworkBlock>();
                         //Debug.Log("PackegType.CreateNewBlock block homeid=" + networkBlock.homeid);
-                        onCreateNewBlock(networkBlock);
+                        StartCoroutine(onCreateNewBlock(networkBlock));
 
                         break;
                     case PackegType.CraftItem:
@@ -330,9 +329,9 @@ public class NetworkLayerClient : MonoBehaviour {
         }
     }
 
-    private void onCreateNewBlock(NetworkBlock networkBlock)
+    private IEnumerator onCreateNewBlock(NetworkBlock networkBlock)
     {
-
+        yield return null;
         networkBlock.Instant(itemDatabase.itemList[networkBlock.typeid]);
         Home home = homes.Find(x => x.idtable == networkBlock.homeid);
         if (home.city != 0)
