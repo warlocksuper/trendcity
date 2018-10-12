@@ -52,6 +52,7 @@ public class PlayerIO : MonoBehaviour {
                 }
                 Chatinput.GetComponentInChildren<InputField>().text = "";
                 Chatinput.SetActive(false);
+
             } else
             {
                 Chatinput.SetActive(true);

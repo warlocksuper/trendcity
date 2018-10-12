@@ -13,12 +13,12 @@ public class verstack : MonoBehaviour {
     private Text guitext;
     private Inventory playerinventory;
     private ObjectNameView textonobj;
-    private float timeLeft = 0;
+    public float timeLeft = 0;
     private Blueprint blueprint;
     private Gamelocal gamelocal;
     private PlayerIO playerIO;
     public List<CraftOrder> craftOrders;
-    private CraftOrder Craftslot;
+    public CraftOrder Craftslot;
     BlueprintDatabase blueprintDatabase;
     private NetworkLayerClient networkLayer;
 
@@ -103,11 +103,6 @@ public class verstack : MonoBehaviour {
                 timeLeft -= Time.deltaTime;
                 if (timeLeft < 0)
                 {
-                    //  if (debugingame != null)
-                    //  {
-                    //      debugingame.text = "";
-                    //  }
-
                     textonobj.text = "";
                     blueprint = Craftslot.blueprint;
                     if (!playerIO.isNetwork) {
@@ -116,14 +111,21 @@ public class verstack : MonoBehaviour {
                             playerinventory.addItemToInventory(blueprint.finalItem.itemID, blueprint.amountOfFinalItem);
                         }
                     removeresource(blueprint);
-                }
+                    }
                         // Craftslot.GetComponent<CraftSlot>().ordercount--;
                     Craftslot.count--; 
                     if(Craftslot.count <=0)
                     {
                     iscrafting = false;
                     Worker.GetComponent<WorkerController>().isbusy = false;
-                    }
+                    playerIO.CraftMan.GetComponent<GUICraftMan>().UpdateOrderList(craftOrders);
+                }
+                //else
+                  //  {
+                  //      int tjisid = this.gameObject.GetComponent<ItemMy>().id;
+                  //      int homeid = this.gameObject.GetComponent<ItemMy>().homeid;
+                   //     networkLayer.CraftItem(blueprint.finalItem.itemID, 1, tjisid, homeid);
+                 //  }
 
                     // playerTrans.gameObject.GetComponent<PlayerIO>().CraftMan.GetComponent<GUICraftMan>().isCrafting = false;
                 }
@@ -146,12 +148,14 @@ public class verstack : MonoBehaviour {
         if (check_ingrdients(blueprint))
         {
             iscrafting = true;
-            timeLeft = blueprint.timeToCraft * 10;
+            timeLeft = blueprint.timeToCraft;
             int tjisid = this.gameObject.GetComponent<ItemMy>().id;
             int homeid = this.gameObject.GetComponent<ItemMy>().homeid;
-            networkLayer.CraftItem(blueprint.finalItem.itemID, Craftslot.count, tjisid, homeid);
+            networkLayer.CraftItem(blueprint.finalItem.itemID, 1, tjisid, homeid);
+            //networkLayer.CraftItem(blueprint.finalItem.itemID, Craftslot.count, tjisid, homeid);
             //Debug.Log("Start start Craft verstack");
-        } else
+        }
+        else
         {
             if (playerIO.isNetwork)
             {
@@ -228,11 +232,14 @@ public class verstack : MonoBehaviour {
 
     public void FinalCraft(CraftNetwork craftNetwork)
     {
-        CraftOrder craftOrder = craftOrders.Find(x => x.blueprint.finalItem.itemID == craftNetwork.finalitem);
-        if(craftOrder.count > 0)
-        {
-            craftOrder.count = craftNetwork.count;
-        }
+        Worker.GetComponent<WorkerController>().isbusy = false;
+        iscrafting = false;
+        /// Хз что с этим делать
+        //  CraftOrder craftOrder = craftOrders.Find(x => x.blueprint.finalItem.itemID == craftNetwork.finalitem);
+        //  if(craftOrder.count > 0)
+        //  {
+        //       craftOrder.count = craftNetwork.count;
+        ///  }
     }
 
 }

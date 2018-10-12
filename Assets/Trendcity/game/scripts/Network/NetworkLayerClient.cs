@@ -177,7 +177,7 @@ public class NetworkLayerClient : MonoBehaviour {
                 // string msg = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
                 PackegType pkgtype = (PackegType)reader.ReadInt32();
                 
-                Debug.Log("Player " + connectionId + " pkg type " + pkgtype);
+               // Debug.Log("Player " + connectionId + " pkg type " + pkgtype);
 
                 switch (pkgtype)
                 {
