@@ -437,14 +437,21 @@ public class NetworkLayerClient : MonoBehaviour {
         // Instantiate(prefab2);
     }
 
+
     void GetNetworkCity(int channelID, int connectionID)
+    {
+        GetNetworkCityID(channelID, connectionID, Player.instance.currentcity);
+    }
+
+    public void GetNetworkCityID(int channelID, int connectionID, int CityID)
     {
         NetworkWriter writer = new NetworkWriter();
         writer.Write((int)PackegType.GetCity);
-        writer.Write(Player.instance.currentcity);
+        writer.Write(CityID);
         Send(writer, channelID, connectionID);
     }
-    
+
+
     public void buy_items(Item item,int count)
     {
         Debug.Log("Network buy item "+item.itemID+ " count" + count);
@@ -600,7 +607,7 @@ public class NetworkLayerClient : MonoBehaviour {
 
 }
 
-
+[System.Serializable]
 public class NetworkCity : MessageBase
 {
     public int id;

@@ -40,158 +40,176 @@ public class Block : MonoBehaviour {
 
         if (Input.GetMouseButtonDown(1))
         {
-
-            Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-            GameObject inventar = GameObject.Find("PlayerGui").transform.GetChild(1).gameObject;
-
-            Color col = Color.red;
-            if (Physics.Raycast(ray)) col = Color.green;
-
-            Debug.DrawRay(ray.origin, ray.direction * 100, col);
-
-            if (Physics.Raycast(ray, out hit, 10f))
+            if (!playerIO.lockMovement())
             {
-                string tag = hit.collider.tag;
-                if (tag == "Block" || tag == "Door" || tag == "homeblock")
+
+
+                Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+                GameObject inventar = GameObject.Find("PlayerGui").transform.GetChild(1).gameObject;
+
+                Color col = Color.red;
+                if (Physics.Raycast(ray)) col = Color.green;
+
+                Debug.DrawRay(ray.origin, ray.direction * 100, col);
+
+                if (Physics.Raycast(ray, out hit, 10f))
                 {
-                    ItemMy itemMy = hit.collider.gameObject.GetComponent<ItemMy>();
-                    Item item = itemMy.Item;
-                    if (playerIO.isNetwork)
+                    string tag = hit.collider.tag;
+                    if (tag == "Block" || tag == "Door" || tag == "homeblock")
                     {
-                        //Vector3 newpos = CreatePosition(hit);
-                        ///ItemMy itemMy = hit.collider.GetComponent<ItemMy>();
-                        ///
-                       //item
-                        Home homecur = networkLayer.GetHomesInList(itemMy.homeid);
-                        homecur.RemoveBlock(hit.collider.gameObject.transform.position);
-                        //Debug.Log("Удаленние блока дом №" + homecur.idtable + " номер блока " + itemMy.id);
-                        
-                        if(tag == "homeblock")
+                        ItemMy itemMy = hit.collider.gameObject.GetComponent<ItemMy>();
+                        Item item = itemMy.Item;
+                        if (playerIO.isNetwork)
                         {
-                            networkLayer.RemoveHome(itemMy.homeid);
-                        } else
-                        {
-                            networkLayer.RemoveBlock(itemMy.id, itemMy.homeid);
+                            //Vector3 newpos = CreatePosition(hit);
+                            ///ItemMy itemMy = hit.collider.GetComponent<ItemMy>();
+                            ///
+                            //item
+                            Home homecur = networkLayer.GetHomesInList(itemMy.homeid);
+                            homecur.RemoveBlock(hit.collider.gameObject.transform.position);
+                            //Debug.Log("Удаленние блока дом №" + homecur.idtable + " номер блока " + itemMy.id);
+
+                            if (tag == "homeblock")
+                            {
+                                networkLayer.RemoveHome(itemMy.homeid);
+                            }
+                            else
+                            {
+                                networkLayer.RemoveBlock(itemMy.id, itemMy.homeid);
+                            }
+                            Destroy(hit.collider.gameObject);
                         }
-                        Destroy(hit.collider.gameObject);
-                    } else
-                    {
-                        if (!inventar.GetComponent<Inventory>().checkIfItemAllreadyExist(item.itemID, 1))
+                        else
                         {
-                            inventar.GetComponent<Inventory>().addItemToInventory(item.itemID);
+                            if (!inventar.GetComponent<Inventory>().checkIfItemAllreadyExist(item.itemID, 1))
+                            {
+                                inventar.GetComponent<Inventory>().addItemToInventory(item.itemID);
+                            }
+
+                            CitySaveAsset save = (CitySaveAsset)Resources.Load("CitySaveAsset");
+                            save.removeItem(hit.collider.gameObject);
+                            Destroy(hit.collider.gameObject);
                         }
 
-                        CitySaveAsset save = (CitySaveAsset)Resources.Load("CitySaveAsset");
-                        save.removeItem(hit.collider.gameObject);
-                        Destroy(hit.collider.gameObject);
+
+                        //save.addItem(item, newblock.transform.position);
                     }
-                        
-
-                    //save.addItem(item, newblock.transform.position);
                 }
             }
         }
 
         if (Input.GetMouseButtonDown(0) && SelectIndex != -1)
         {
-            
-            GameObject slot = hotbar.transform.GetChild(1).GetChild(SelectIndex).gameObject;
-            
-
-            if (slot.transform.childCount > 0)
+            if (!playerIO.lockMovement())
             {
-                GameObject invitem = slot.transform.GetChild(0).gameObject;
-                Item item = invitem.GetComponent<ItemOnObject>().item;
-                
-                
+                GameObject slot = hotbar.transform.GetChild(1).GetChild(SelectIndex).gameObject;
+
+
+                if (slot.transform.childCount > 0)
+                {
+                    GameObject invitem = slot.transform.GetChild(0).gameObject;
+                    Item item = invitem.GetComponent<ItemOnObject>().item;
+
+
                     // Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                     Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-                    
-                    if (Physics.Raycast(ray, out hit))
-                        {
-                    if (item.itemType == ItemType.homeblock && hit.collider.tag == "Terrain") {
-                        if (playerIO.isNetwork)
-                        {
-                            networkLayer.HomeListAdd(CreatePosition(hit));
-                        } else { 
-                            Gamelocal gamelocal = GameObject.Find("GameLocal").GetComponent<Gamelocal>();
-                            gamelocal.city.HomeList.Add(new Home());
-                            create_new_obj(item, hit, gamelocal.city.HomeList.Count);
-                        }
 
-                    }
-                    if (item.itemType == ItemType.Block )
+                    if (Physics.Raycast(ray, out hit))
                     {
-                        if (hit.collider.tag == "homeblock" || hit.collider.tag == "Block")
-                            {
+                        if (item.itemType == ItemType.homeblock && hit.collider.tag == "Terrain")
+                        {
                             if (playerIO.isNetwork)
                             {
-                                Vector3 newpos = CreatePosition(hit);
-                                ItemMy itemMy = hit.collider.GetComponent<ItemMy>();
-                                int homeid = itemMy.homeid;
-                                networkLayer.CreateNewBlock(newpos, homeid, item.itemID);
-                            } else
+                                networkLayer.HomeListAdd(CreatePosition(hit));
+                            }
+                            else
                             {
-                                int homeid = hit.collider.GetComponent<ItemMy>().homeid;
-                                create_new_obj(item, hit, homeid);
-                                if (hotbar.transform.GetChild(1).GetChild(SelectIndex).childCount != 0 && hotbar.transform.GetChild(1).GetChild(SelectIndex).GetChild(0).GetComponent<ItemOnObject>().item.itemType != ItemType.UFPS_Ammo)
-                                {
-                                    if (hotbar.transform.GetChild(1).GetChild(SelectIndex).GetChild(0).GetComponent<ConsumeItem>().duplication != null && hotbar.transform.GetChild(1).GetChild(SelectIndex).GetChild(0).GetComponent<ItemOnObject>().item.maxStack == 1)
-                                    {
-                                        Destroy(hotbar.transform.GetChild(1).GetChild(SelectIndex).GetChild(0).GetComponent<ConsumeItem>().duplication);
-                                    }
-                                    hotbar.transform.GetChild(1).GetChild(SelectIndex).GetChild(0).GetComponent<ConsumeItem>().consumeIt();
-                                }
+                                Gamelocal gamelocal = GameObject.Find("GameLocal").GetComponent<Gamelocal>();
+                                gamelocal.city.HomeList.Add(new Home());
+                                create_new_obj(item, hit, gamelocal.city.HomeList.Count);
                             }
 
-
-
                         }
+                        if (item.itemType == ItemType.Block)
+                        {
+                            if (hit.collider.tag == "homeblock" || hit.collider.tag == "Block")
+                            {
+                                if (playerIO.isNetwork)
+                                {
+                                    Vector3 newpos = CreatePosition(hit);
+                                    ItemMy itemMy = hit.collider.GetComponent<ItemMy>();
+                                    int homeid = itemMy.homeid;
+                                    networkLayer.CreateNewBlock(newpos, homeid, item.itemID);
+                                }
+                                else
+                                {
+                                    int homeid = hit.collider.GetComponent<ItemMy>().homeid;
+                                    create_new_obj(item, hit, homeid);
+                                    if (hotbar.transform.GetChild(1).GetChild(SelectIndex).childCount != 0 && hotbar.transform.GetChild(1).GetChild(SelectIndex).GetChild(0).GetComponent<ItemOnObject>().item.itemType != ItemType.UFPS_Ammo)
+                                    {
+                                        if (hotbar.transform.GetChild(1).GetChild(SelectIndex).GetChild(0).GetComponent<ConsumeItem>().duplication != null && hotbar.transform.GetChild(1).GetChild(SelectIndex).GetChild(0).GetComponent<ItemOnObject>().item.maxStack == 1)
+                                        {
+                                            Destroy(hotbar.transform.GetChild(1).GetChild(SelectIndex).GetChild(0).GetComponent<ConsumeItem>().duplication);
+                                        }
+                                        hotbar.transform.GetChild(1).GetChild(SelectIndex).GetChild(0).GetComponent<ConsumeItem>().consumeIt();
+                                    }
+                                }
+
+
+
+                            }
                         }
                         // create_new_obj(Item item,)
                     }
-                //item.itemModel;
+                    //item.itemModel;
+                }
             }
         }
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-
-            if (Physics.Raycast(ray, out hit))
+            if (!playerIO.lockMovement())
             {
+                Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 
-                if (hit.collider.tag == "Block" || hit.collider.tag == "Door")
+                if (Physics.Raycast(ray, out hit))
                 {
 
-                    Vector3 currentp = hit.collider.transform.localEulerAngles;
-                    //float currenty;
-                    if (isShiftKeyDown)
+                    if (hit.collider.tag == "Block" || hit.collider.tag == "Door")
                     {
-                        currentp.x += 90f;
 
-                        //Debug.Log("Разворачиваем обьект shift текущий угол" + currentp.x);
-                    } else
-                    {
-                        currentp.y += 90f;
-                        //Debug.Log("Разворачиваем обьект текущий угол" + currentp.y);
-                    }
-                    
-                    Quaternion target = Quaternion.Euler(currentp);
-                    hit.collider.transform.rotation = target;
-                    int homeid = hit.collider.transform.GetComponent<ItemMy>().homeid - 1;
-                    if (playerIO.isNetwork)
-                    {
-                        Debug.Log("Разворачиваем обьект текущий угол x " + hit.collider.transform.localEulerAngles.x + "угол y " + hit.collider.transform.localEulerAngles.y);
-                        ItemMy rotblock = hit.collider.gameObject.GetComponent<ItemMy>();
-                        networkLayer.RotateBlock(rotblock.id, hit.collider.transform.localEulerAngles);
-                    } else {
-                        CitySaveAsset save = (CitySaveAsset)Resources.Load("CitySaveAsset");
-                        save.rotateItem(hit.collider.transform.position, hit.collider.transform.localEulerAngles, homeid);
-                    }
+                        Vector3 currentp = hit.collider.transform.localEulerAngles;
+                        //float currenty;
+                        if (isShiftKeyDown)
+                        {
+                            currentp.x += 90f;
+
+                            //Debug.Log("Разворачиваем обьект shift текущий угол" + currentp.x);
+                        }
+                        else
+                        {
+                            currentp.y += 90f;
+                            //Debug.Log("Разворачиваем обьект текущий угол" + currentp.y);
+                        }
+
+                        Quaternion target = Quaternion.Euler(currentp);
+                        hit.collider.transform.rotation = target;
+                        int homeid = hit.collider.transform.GetComponent<ItemMy>().homeid - 1;
+                        if (playerIO.isNetwork)
+                        {
+                            Debug.Log("Разворачиваем обьект текущий угол x " + hit.collider.transform.localEulerAngles.x + "угол y " + hit.collider.transform.localEulerAngles.y);
+                            ItemMy rotblock = hit.collider.gameObject.GetComponent<ItemMy>();
+                            networkLayer.RotateBlock(rotblock.id, hit.collider.transform.localEulerAngles);
+                        }
+                        else
+                        {
+                            CitySaveAsset save = (CitySaveAsset)Resources.Load("CitySaveAsset");
+                            save.rotateItem(hit.collider.transform.position, hit.collider.transform.localEulerAngles, homeid);
+                        }
                         //RotateBlock
 
 
+                    }
                 }
             }
 
@@ -199,29 +217,33 @@ public class Block : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.R) && Input.GetKeyDown(KeyCode.LeftShift))
         {
-            Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-
-            if (Physics.Raycast(ray, out hit))
+            if (!playerIO.lockMovement())
             {
-                if (hit.collider.tag == "Block")
+                Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+
+                if (Physics.Raycast(ray, out hit))
                 {
-                   // Debug.Log("Разворачиваем обьект текущий угол" + hit.collider.transform.localEulerAngles.y);
-                    float currenty = hit.collider.transform.localEulerAngles.z;
-                    currenty += 90f;
-                    Quaternion target = Quaternion.Euler(0, 0, currenty);
-                    hit.collider.transform.rotation = target;
-                    int homeid = hit.collider.transform.GetComponent<ItemMy>().homeid - 1;
-                    if (playerIO.isNetwork)
+                    if (hit.collider.tag == "Block")
                     {
-                        ItemMy rotblock = hit.collider.gameObject.GetComponent<ItemMy>();
-                        networkLayer.RotateBlock(rotblock.id, hit.collider.transform.localEulerAngles);
-                    }
-                    else {
-                        CitySaveAsset save = (CitySaveAsset)Resources.Load("CitySaveAsset");
-                        save.rotateItem(hit.collider.transform.position, hit.collider.transform.localEulerAngles, homeid);
-                    }
+                        // Debug.Log("Разворачиваем обьект текущий угол" + hit.collider.transform.localEulerAngles.y);
+                        float currenty = hit.collider.transform.localEulerAngles.z;
+                        currenty += 90f;
+                        Quaternion target = Quaternion.Euler(0, 0, currenty);
+                        hit.collider.transform.rotation = target;
+                        int homeid = hit.collider.transform.GetComponent<ItemMy>().homeid - 1;
+                        if (playerIO.isNetwork)
+                        {
+                            ItemMy rotblock = hit.collider.gameObject.GetComponent<ItemMy>();
+                            networkLayer.RotateBlock(rotblock.id, hit.collider.transform.localEulerAngles);
+                        }
+                        else
+                        {
+                            CitySaveAsset save = (CitySaveAsset)Resources.Load("CitySaveAsset");
+                            save.rotateItem(hit.collider.transform.position, hit.collider.transform.localEulerAngles, homeid);
+                        }
 
 
+                    }
                 }
             }
 
