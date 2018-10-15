@@ -14,11 +14,9 @@ public class ItemsController : MonoBehaviour {
 	void Update () {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            var fwd = transform.TransformDirection(Vector3.forward);
-            Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.5f));
-            RaycastHit hit;
+            Transform playerTrans = GameObject.FindGameObjectWithTag("Player").transform;
 
-            if (Physics.Raycast(ray, out hit, 2f))
+            if (Vector3.Distance(playerTrans.position, this.transform.position) < 2f)
             {
                     GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerIO>().ShowQestWindows();
             }

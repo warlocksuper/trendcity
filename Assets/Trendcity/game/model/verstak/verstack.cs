@@ -182,32 +182,16 @@ public class verstack : MonoBehaviour {
         int i = 0;
         for (i = 0; i < counting; i++)
         {
-            if(!check_ingrdient(blueprint.ingredients[i], blueprint.amount[i]))
+            playerinventory = GameObject.Find("PlayerGui").transform.GetChild(1).GetComponent<Inventory>();
+            if (!playerinventory.check_ingrdient(blueprint.ingredients[i], blueprint.amount[i]))
             {
-                
                 return false;
             }
         }
         
         return true;
     }
-    public bool check_ingrdient(int itemid,int itemcount)
-    {
-        playerinventory = GameObject.Find("PlayerGui").transform.GetChild(1).GetComponent<Inventory>();
-        //Debug.Log("Start Craft check_ingrdient itemid=" + itemid.ToString()+ " itemcount="+ itemcount.ToString());
-        foreach (var item in playerinventory.ItemsInInventory)
-        {
-            if (item.itemID == itemid)
-            {
-                if (item.itemValue < itemcount)
-                {
-                    return false;
-                } else { return true; }
-            }
-        }
-       // Debug.Log("Start Craft check_ingrdient itemid=" + itemid.ToString() + " ItemsInInventorycount=" + playerinventory.ItemsInInventory.Count);
-        return false;
-    }
+
     public void removeresource(Blueprint blueprint)
     {
         playerinventory = GameObject.Find("PlayerGui").transform.GetChild(1).GetComponent<Inventory>();

@@ -916,7 +916,25 @@ public class Inventory : MonoBehaviour
     }
 
 
+    public bool check_ingrdient(int itemid, int itemcount)
+    {      
+        for (int k = 0; k < SlotContainer.transform.childCount; k++)
+        {
+            if (SlotContainer.transform.GetChild(k).childCount != 0)
+            {
+                GameObject itemGameObject = SlotContainer.transform.GetChild(k).GetChild(0).gameObject;
+                Item itemObject = itemGameObject.GetComponent<ItemOnObject>().item;
+                if (itemObject.itemID == itemid) {
 
+                    if (itemObject.itemValue >= itemcount)
+                    {
+                        return true;
+                    }
+                }              
+            } 
+        }
+        return false;
+    }
 
     public void updateItemIndex()
     {

@@ -154,6 +154,19 @@ public class PlayerIO : MonoBehaviour {
     {
         if(isNetwork)
         {
+            MenuManager menuManager = GameObject.Find("MenuManager").GetComponent<MenuManager>();
+            Inventory inventory = Prefinv.GetComponent<Inventory>();
+            if(!inventory.check_ingrdient(26,600))
+            {
+                menuManager.Debuglog("Не хватает брёвен");
+                return;
+            }
+            if (!inventory.check_ingrdient(27, 400))
+            {
+                menuManager.Debuglog("Не хватает деревянных блоков");
+                return;
+            }
+
 
         }
         QestWindow.SetActive(false);
