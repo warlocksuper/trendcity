@@ -111,6 +111,11 @@
     <Compile Include="Assets\Trendcity\game\model\verstak\verstack.cs" />
     <Compile Include="Assets\Trendcity\game\model\кровать\mbjbkpza7x-bed\bed\Bed.cs" />
     <Compile Include="Assets\Trendcity\game\scripts\City.cs" />
+    <Compile Include="Assets\Trendcity\game\scripts\Citylist\ChangeCity.cs" />
+    <Compile Include="Assets\Trendcity\game\scripts\Citylist\CitySlot.cs" />
+    <Compile Include="Assets\Trendcity\game\scripts\Citylist\CityTeleportClick.cs" />
+    <Compile Include="Assets\Trendcity\game\scripts\Citylist\CloseCitilistWindow.cs" />
+    <Compile Include="Assets\Trendcity\game\scripts\Citylist\GUICitylist.cs" />
     <Compile Include="Assets\Trendcity\game\scripts\CitySaveAsset.cs" />
     <Compile Include="Assets\Trendcity\game\scripts\DestroyableTree.cs" />
     <Compile Include="Assets\Trendcity\game\scripts\HarwestWood.cs" />

@@ -13,22 +13,7 @@ public class GUICraftMan : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        /*
-		if(!isCrafting)
-        {
-            foreach (var item in OrderList)
-            {
-                if(item.GetComponent<CraftSlot>().ordercount > 0)
-                {
-                    Gamelocal gamelocal = GameObject.Find("GameLocal").GetComponent<Gamelocal>();
-                    gamelocal.StartCraft(verstack, item, OrderList);
-                    isCrafting = true;
-                    return;
-                }
-            }
-            
-        }
-        */
+
 	}
 
     public void UpdateOrderList(List<CraftOrder> craftOrders)

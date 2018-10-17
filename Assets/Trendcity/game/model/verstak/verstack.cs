@@ -54,7 +54,7 @@ public class verstack : MonoBehaviour {
             if (playerIO.isNetwork)
             {
                // money= Player.instance.money;
-                money = networkLayer.PlayerMoney;
+                money = networkLayer.player.money;
             } else
             {
                 money = gamelocal.PlayerMoney;
@@ -132,7 +132,7 @@ public class verstack : MonoBehaviour {
                 else
                 {
                     int stlefttime = (int)timeLeft;
-                    textonobj.text = "<b>Создание " + blueprint.finalItem.itemName + " осталось  " + stlefttime.ToString() + "сек</b>";
+                    textonobj.text = "<b>Создание " + blueprint.finalItem.itemName + " осталось  " + stlefttime.ToString() + " сек</b>";
                 }
 
             }

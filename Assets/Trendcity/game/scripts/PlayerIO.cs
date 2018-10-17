@@ -15,14 +15,17 @@ public class PlayerIO : MonoBehaviour {
     public GameObject CraftMan;
     public GameObject Chatinput;
     public GameObject QestWindow;
+    public GameObject CitylistWindow;
     public byte selectedInventory = 0;
     private bool inventar_isActive = false;
     public bool isNetwork = false;
+    private NetworkLayerClient networkLayerClient;
     // Use this for initialization
-	void Start () {
+    void Start () {
         Cursor.visible = false;
-        
-	}
+        networkLayerClient= GameObject.Find("NetworkManager").GetComponent<NetworkLayerClient>();
+
+    }
 	
     
 	// Update is called once per frame
@@ -47,7 +50,7 @@ public class PlayerIO : MonoBehaviour {
             {
                 if (isNetwork)
                 {
-                    NetworkLayerClient networkLayerClient = GameObject.Find("NetworkManager").GetComponent<NetworkLayerClient>();
+                    
                     string text=Chatinput.GetComponentInChildren<InputField>().text;
                     string[] parsecommand = text.Split(' ');
                     if (parsecommand[0] == "/teleport" && parsecommand.Length > 1) { 
@@ -75,6 +78,7 @@ public class PlayerIO : MonoBehaviour {
             Prefinv.SetActive(false);
             Chatinput.SetActive(false);
             QestWindow.SetActive(false);
+            CitylistWindow.SetActive(false);
 
             if (cMenu.activeSelf)
             {
@@ -113,13 +117,18 @@ public class PlayerIO : MonoBehaviour {
         NetworkLayerClient networkLayerClient = GameObject.Find("NetworkManager").GetComponent<NetworkLayerClient>();
         GameObject cityobj = GameObject.Find("Terrain_" + networkLayerClient.citynetwork.tamplate + "(Clone)");
         Destroy(cityobj);
+        foreach (GameObject workerObj in GameObject.FindGameObjectsWithTag("Worker"))
+        {
+            Destroy(workerObj);
+        }
+        networkLayerClient.workercount = 0;
         for (int i = 0; i < networkLayerClient.homes.Count; i++)
         {
             Home home = networkLayerClient.homes[i];
             GameObject homeobj = GameObject.Find("Home_" + home.idtable);
             Destroy(homeobj);
         }
-        Player.instance.currentcity = cityID;
+        networkLayerClient.player.currentcity = cityID;
         networkLayerClient.homes.Clear();
         networkLayerClient.GetNetworkCityID(networkLayerClient.channelId, networkLayerClient.connectionId, cityID);
         // Player.instance.
@@ -142,6 +151,8 @@ public class PlayerIO : MonoBehaviour {
         else if (Chatinput != null && Chatinput.activeSelf)
             return true;
         else if (QestWindow != null && QestWindow.activeSelf)
+            return true;
+        else if (CitylistWindow != null && CitylistWindow.activeSelf)
             return true;
         else
         {
@@ -166,7 +177,7 @@ public class PlayerIO : MonoBehaviour {
                 menuManager.Debuglog("Не хватает деревянных блоков");
                 return;
             }
-
+            networkLayerClient.StartQuest();
 
         }
         QestWindow.SetActive(false);

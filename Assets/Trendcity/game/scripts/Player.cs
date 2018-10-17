@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
 [System.Serializable]
-public class Player : MonoBehaviour
+public class Player : MessageBase
 {
-    public static Player instance;
+  //  public static Player instance;
 
     private void Awake()
     {
-        instance = this;
+    //    instance = this;
     }
 
     //General
@@ -20,4 +21,5 @@ public class Player : MonoBehaviour
     public int homecity;
     public int currentcity;
     public int money;
+    public int lodka;
 }

@@ -16,9 +16,12 @@ public class ItemsController : MonoBehaviour {
         {
             Transform playerTrans = GameObject.FindGameObjectWithTag("Player").transform;
 
-            if (Vector3.Distance(playerTrans.position, this.transform.position) < 2f)
+            if (Vector3.Distance(playerTrans.position, this.transform.position) < 3f)
             {
+                if (this.itemtype == InventarControler.ItemsType.QUEST)
+                {
                     GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerIO>().ShowQestWindows();
+                }
             }
         }
     }

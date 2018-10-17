@@ -41,11 +41,12 @@ public class Door : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.E) && !doorGo) //&& !doorGo
         {
-            Debug.Log("Open door");
+           
             if (Vector3.Distance(playerTrans.position, this.transform.position) < 2f)
             {
                 if (doorStatus)
                 { //close door
+                    Debug.Log("Open door");
                     StartCoroutine(this.moveDoor(doorClose));
                 }
                 else

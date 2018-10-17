@@ -50,17 +50,6 @@ public class InventarControler : MonoBehaviour {
         }
 
 
-        //GameObject slots;
-        /*
-        if(index < 9)
-        {
-            slots = GameObject.Find("Slot_inv_0" + (index +1));
-        } else
-        {
-            slots = GameObject.Find("Slot_inv_" + (index+1));
-        }
-        */
-
         GameObject itemobject = null;
 
         if (slots[index].transform.childCount > 0)
@@ -77,32 +66,7 @@ public class InventarControler : MonoBehaviour {
         }
 
         itemobject.GetComponent<ItemObject>().SetItem(count, name);
-        // itemobject =       slots.transform.Find("imginv");
-
-        /*
-        if (!PlayerIO.isNetwork) { 
-
-        } else
-        {
-            //string findname = "Slot_0" + (index + 1);
-            invetartextcount[index].enabled = true;
-            invetartextcount[index].text = "" + count;
-
-            RawImage invimg = Resources.Load("items/icon/" + Inventar[index].NameItem + ".png") as RawImage;
-
-            invetarimadgslot[index].texture = invimg.texture;
-
-
-            
-
-            
-        }
-        */
-
-        // GameObject countinv = inventpref.GetComponent<Text>();
-
-        // countinv.text = "" + count;
-        //GameObject inventpref =  GameObject.Find("pref_inventar");
+   
     }
 }
 

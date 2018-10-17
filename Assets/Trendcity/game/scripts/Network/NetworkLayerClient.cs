@@ -24,7 +24,9 @@ public enum PackegType
     RotateBlock,
     CraftItem,
     RemoveHome,
-    SendChat
+    SendChat,
+    StartQuest,
+    GetCitylist
 }
 
 
@@ -76,8 +78,7 @@ public class NetworkLayerClient : MonoBehaviour {
     public GameObject playerGUI;
     public Inventory playerInventory;
     private PlayerIO playerIO;
-    public int PlayerMoney = 0;
-    public int PlayerLodka = 0;
+    public Player player;
     private GameObject txmoney;
     private GameObject Txmanount;
     public int workercount=0;
@@ -87,6 +88,7 @@ public class NetworkLayerClient : MonoBehaviour {
     // Use this for initialization
     void Start () {
         itemDatabase = (ItemDataBaseList)Resources.Load("ItemDatabase");
+        player = new Player();
         NetworkTransport.Init();
         homes = new List<Home>();
     }
@@ -156,7 +158,7 @@ public class NetworkLayerClient : MonoBehaviour {
                 txmoney = playerGUI.transform.Find("Txmoney").gameObject;
             }
 
-            txmoney.GetComponent<Text>().text = "Денег " + PlayerMoney + "р";
+            txmoney.GetComponent<Text>().text = "Денег " + player.money + "р";
             if(Txmanount == null)
             {
                 Txmanount= playerGUI.transform.Find("Txmanount").gameObject;
@@ -187,15 +189,15 @@ public class NetworkLayerClient : MonoBehaviour {
                         break;
                     case PackegType.NetworkAccess:
 
-                        Player.instance.playerName = reader.ReadString();
-                        Player.instance.position = reader.ReadVector3();
-                        Player.instance.Access = reader.ReadInt32();
-                        Player.instance.homecity = reader.ReadInt32();
-                        Player.instance.currentcity = reader.ReadInt32();
-                        PlayerMoney = reader.ReadInt32();
-                        PlayerLodka = reader.ReadInt32();
+                        player.playerName = reader.ReadString();
+                        player.position = reader.ReadVector3();
+                        player.Access = reader.ReadInt32();
+                        player.homecity = reader.ReadInt32();
+                        player.currentcity = reader.ReadInt32();
+                        player.money = reader.ReadInt32();
+                        player.lodka = reader.ReadInt32();
 
-                        if (Player.instance.Access == 1)
+                        if (player.Access == 1)
                         {
                             //// загрузка сцены
                            // Debug.Log("send gameobgect =" + Player.instance.name);
@@ -210,17 +212,33 @@ public class NetworkLayerClient : MonoBehaviour {
                         break;
                     case PackegType.GetCity:
                         citynetwork = reader.ReadMessage<NetworkCity>();
-                        Debug.Log("get city id="+ citynetwork.id);
+                        //Debug.Log("get city id="+ citynetwork.id);
                         switch (citynetwork.tamplate)
                         {
                             case 1:   
                                 GameObject prefab = Resources.Load("Terrain_1") as GameObject;
-                                Instantiate(prefab);   
+                                GameObject terrain=Instantiate(prefab);
+                                if(player.lodka == 1)
+                                {
+                                    terrain.transform.Find("boat").gameObject.SetActive(false);
+                                    terrain.transform.Find("board_OK").gameObject.SetActive(true);
+                                }
                             break;
+                           
                             default:
                             break;
                         }
                         GameObject.FindGameObjectWithTag("Player").transform.position = citynetwork.spawn;
+                        break;
+                    case PackegType.GetCitylist:
+                        List<NetworkCity> networkCities = new List<NetworkCity>();
+                        int citycount = reader.ReadInt32();
+                        for(int i=0;i< citycount;i++)
+                        {
+                            NetworkCity networkCity=reader.ReadMessage<NetworkCity>();
+                            networkCities.Add(networkCity);
+                        }
+                        GameObject.Find("Panel - CityList").GetComponent<ChangeCity>().ShowCityList(networkCities);
                         break;
                     case PackegType.GetInventory:
                         InventoryNetwork inventoryNetwork = reader.ReadMessage<InventoryNetwork>();
@@ -247,7 +265,7 @@ public class NetworkLayerClient : MonoBehaviour {
                         
                         int itemid = reader.ReadInt32();
                         int itemcount = reader.ReadInt32();
-                        Debug.Log("GetItemInventory itemid=" + itemid + "itemcount=" + itemcount);
+                       // Debug.Log("GetItemInventory itemid=" + itemid + "itemcount=" + itemcount);
                         Hotbar hotbar = GameObject.FindGameObjectWithTag("Hotbar").GetComponent<Hotbar>();
                         // Inventory inventory = GameObject.Find("PlayerGui").transform.GetChild(1).GetComponent<Inventory>();
 
@@ -280,7 +298,7 @@ public class NetworkLayerClient : MonoBehaviour {
                                              
                         break;
                     case PackegType.GetMoney:
-                        PlayerMoney = reader.ReadInt32();
+                        player.money = reader.ReadInt32();
                         break;
                     case PackegType.CreateNewHome:
                         Home NetworkHome = reader.ReadMessage<Home>();
@@ -314,6 +332,8 @@ public class NetworkLayerClient : MonoBehaviour {
                         string chattext = reader.ReadString();
                         MenuManager menuManager = GameObject.Find("MenuManager").GetComponent<MenuManager>();
                         menuManager.Debuglog(chattext);
+                        break;
+                    case PackegType.StartQuest:
                         break;
                     default:
                         break;
@@ -440,7 +460,7 @@ public class NetworkLayerClient : MonoBehaviour {
 
     void GetNetworkCity(int channelID, int connectionID)
     {
-        GetNetworkCityID(channelID, connectionID, Player.instance.currentcity);
+        GetNetworkCityID(channelID, connectionID, player.currentcity);
     }
 
     public void GetNetworkCityID(int channelID, int connectionID, int CityID)
@@ -451,6 +471,12 @@ public class NetworkLayerClient : MonoBehaviour {
         Send(writer, channelID, connectionID);
     }
 
+    public void GetCityList()
+    {
+        NetworkWriter writer = new NetworkWriter();
+        writer.Write((int)PackegType.GetCitylist);
+        Send(writer, channelId, connectionId);
+    }
 
     public void buy_items(Item item,int count)
     {
@@ -604,7 +630,12 @@ public class NetworkLayerClient : MonoBehaviour {
         }
     }
 
-
+    public void StartQuest()
+    {
+        NetworkWriter writer = new NetworkWriter();
+        writer.Write((int)PackegType.StartQuest);
+        Send(writer, channelId, connectionId);
+    }
 }
 
 [System.Serializable]
@@ -667,7 +698,7 @@ public class InventoryNetwork : MessageBase
         int i = 0;
         for (i = 0; i < coune; i++)
         {
-            items.Add(ItemNetwork.Deserialize(reader));
+            items.Add(ItemNetwork.DeserializeAdd(reader));
         }
     }
 
@@ -686,11 +717,19 @@ public class ItemNetwork : MessageBase
         writer.Write(count);
     }
 
-    public static ItemNetwork Deserialize(NetworkReader reader)
+    public override void Deserialize(NetworkReader reader)
     {
-        ItemNetwork item = new ItemNetwork();
-        item.itemId = reader.ReadInt32();
-        item.count = reader.ReadInt32();
+        itemId = reader.ReadInt32();
+        count = reader.ReadInt32();
+    }
+
+    public static ItemNetwork DeserializeAdd(NetworkReader reader)
+    {
+        ItemNetwork item = new ItemNetwork
+        {
+            itemId = reader.ReadInt32(),
+            count = reader.ReadInt32()
+        };
         return item;
     }
 }

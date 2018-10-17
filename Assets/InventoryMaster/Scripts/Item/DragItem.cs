@@ -12,7 +12,7 @@ public class DragItem : MonoBehaviour, IDragHandler, IPointerDownHandler, IEndDr
     private GameObject oldSlot;
     private Inventory inventory;
     private Transform draggedItemBox;
-
+    private NetworkLayerClient networkLayerClient;
     public delegate void ItemDelegate();
     public static event ItemDelegate updateInventoryList;
     private PlayerIO playerIO;
@@ -22,7 +22,8 @@ public class DragItem : MonoBehaviour, IDragHandler, IPointerDownHandler, IEndDr
         canvasGroup = GetComponent<CanvasGroup>();
         rectTransformSlot = GameObject.FindGameObjectWithTag("DraggingItem").GetComponent<RectTransform>();
         inventory = transform.parent.parent.parent.GetComponent<Inventory>();
-        draggedItemBox = GameObject.FindGameObjectWithTag("DraggingItem").transform;     
+        draggedItemBox = GameObject.FindGameObjectWithTag("DraggingItem").transform;
+        networkLayerClient = GameObject.Find("NetworkManager").GetComponent<NetworkLayerClient>();
     }
 
 
@@ -122,7 +123,7 @@ public class DragItem : MonoBehaviour, IDragHandler, IPointerDownHandler, IEndDr
                         int PlayerMoney=0;
                         if (playerIO.isNetwork)
                         {
-                            PlayerMoney = GameObject.Find("NetworkManager").GetComponent<NetworkLayerClient>().PlayerMoney;
+                            PlayerMoney = networkLayerClient.player.money;
                         } else
                         {
                             PlayerMoney = GameObject.Find("GameLocal").GetComponent<Gamelocal>().PlayerMoney;
@@ -150,8 +151,8 @@ public class DragItem : MonoBehaviour, IDragHandler, IPointerDownHandler, IEndDr
                             
                             if (playerIO.isNetwork)
                             {
-                                PlayerMoney = GameObject.Find("NetworkManager").GetComponent<NetworkLayerClient>().PlayerMoney;
-                                GameObject.Find("NetworkManager").GetComponent<NetworkLayerClient>().buy_items(firstItem,1);
+                                PlayerMoney = networkLayerClient.player.money;
+                                networkLayerClient.buy_items(firstItem, 1);
                                 //buy_items
                             }
                             else
@@ -210,7 +211,7 @@ public class DragItem : MonoBehaviour, IDragHandler, IPointerDownHandler, IEndDr
                     // Gamelocal.instance.PlayerMoney = Gamelocal.instance.PlayerMoney + (firstItem.price * firstItem.itemValue);
                     if (playerIO.isNetwork)
                     {
-                        GameObject.Find("NetworkManager").GetComponent<NetworkLayerClient>().sell_items(firstItem);
+                        networkLayerClient.sell_items(firstItem);
                     } else
                     {
                         int PlayerMoney = GameObject.Find("GameLocal").GetComponent<Gamelocal>().PlayerMoney;
